@@ -1,0 +1,25 @@
+# Liste d'émissions pour rcrss.py — une URL par ligne.
+# Les lignes commençant par # sont ignorées.
+# Pour ajouter une émission : ouvrez sa page sur OHdio
+# (ici.radio-canada.ca/ohdio) et collez ici l'adresse de la page.
+# Les émissions de Première comme les balados OHdio sont acceptés.
+#
+# Utilisation : python3 rcrss.py --liste emissions.txt
+
+# Aujourd'hui l'histoire (Maxime Coutié)
+https://ici.radio-canada.ca/ohdio/premiere/emissions/3855/aujourd-hui-l-histoire
+
+# La journée est encore jeune (Jean-Philippe Wauthier)
+https://ici.radio-canada.ca/ohdio/balados/9887/la-journee-est-encore-jeune
+
+# L'histoire en personne (Jean-François Nadeau)
+https://ici.radio-canada.ca/ohdio/balados/13040/lhistoire-en-personne
+
+# Les pires moments de l'histoire (Charles Beauchesne)
+https://ici.radio-canada.ca/ohdio/balados/7135/pires-moments-histoire-charles-beauchesne-humoriste
+
+# Hors des ondes (Patrice Roy)
+https://ici.radio-canada.ca/ohdio/balados/13843/hors-des-ondes-avec-patrice-roy
+
+# Pouvez-vous répéter la question? (Pierre Brassard)
+https://ici.radio-canada.ca/ohdio/balados/7791/humour-quiz-jeu-pierre-brassard

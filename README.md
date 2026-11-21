@@ -16,4 +16,6 @@ Flux RSS des émissions de Radio-Canada Première, générés pour être écout�
 
 Adresse des flux : `https://fabricegagnon-a11y.github.io/ohdio-flux/<fichier>.xml`
 
-Les flux sont mis à jour chaque jour, automatiquement.
+## Mise à jour automatique
+
+Les flux sont mis à jour chaque jour, automatiquement, par une tâche GitHub Actions (`.github/workflows/mise-a-jour-quotidienne.yml`) qui lance `rcrss.py` vers 15 h, heure de Toronto. Le programme (`rcrss.py`, `emissions.txt`) et son cache (`cache.json`) sont dans ce dépôt. Le flux d'archives 2017-2020 est figé et n'est jamais régénéré.
