@@ -39414,5 +39414,19 @@
   "tailles": {
    "8877962": 36357314
   }
+ },
+ "1291107": {
+  "titre": "La chauve-souris de Sorel-Tracy et James Bond",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/7791/humour-quiz-jeu-pierre-brassard/1291107/pascal-cameron-matthieu-pepper-sophie-cadieux",
+  "resume": "Cette semaine, Pierre Brassard reçoit Pascal Cameron, Matthieu Pepper et Sophie Cadieux, qui doivent répondre à des questions sur : la nervosité de Doug Ford, la chauve-souris de Sorel-Tracy, le slogan démocrate en Alaska, le groupe Oasis, le nouveau James Bond, Séraffine, la vache ferrandaise, et le massacre de Ô Canada .",
+  "duree": 3194,
+  "diffuse_le": "2026-11-21T18:00:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10815364": "https://rcavmedias-download.akamaized.net/mp4/3f1fcf2d-4c8a-43bf-92d5-12d9375df6ee/2026-11-21_11_51_00_repeterlaquestionwweb_0000_128.mp4"
+  },
+  "tailles": {
+   "10815364": 58956172
+  }
  }
 }
