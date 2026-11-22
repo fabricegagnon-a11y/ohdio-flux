@@ -39428,5 +39428,19 @@
   "tailles": {
    "10815364": 58956172
   }
+ },
+ "1290613": {
+  "titre": "La biologiste Catherine Potvin dénonce le pouvoir du lobby du pétrole au Canada",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/13843/hors-des-ondes-avec-patrice-roy/1290613/la-biologiste-catherine-potvin-denonce-le-pouvoir-du-lobby-du-petrole-au-canada",
+  "resume": "Au micro de Patrice Roy, la biologiste de renommée mondiale Catherine Potvin est catégorique : on fait face à un lobby extrême de l'industrie pétrolière au Canada qui nous empêche d'avancer dans la lutte contre les changements climatiques. Une entrevue sans filtre sur le climat, qui donne l'heure juste et des raisons d'espérer.",
+  "duree": 4037,
+  "diffuse_le": "2026-11-22T16:00:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10813558": "https://rcavmedias-download.akamaized.net/mp4/6219e024-d8db-43e1-9052-089a57013764/2026-11-19_11_40_34_horsdesondespatriceroyohdio_0000_128.mp4"
+  },
+  "tailles": {
+   "10813558": 72321085
+  }
  }
 }
