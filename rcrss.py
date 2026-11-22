@@ -22,9 +22,17 @@ dépendance : Python 3.10+ suffit (bibliothèque standard uniquement).
 Exemples :
   python3 rcrss.py "https://ici.radio-canada.ca/ohdio/premiere/emissions/3855/aujourd-hui-l-histoire"
   python3 rcrss.py --liste emissions.txt --max-episodes 100 --sortie flux
+  python3 rcrss.py --archives flux/aujourd-hui-l-histoire-3855.xml --sortie-archives flux/archives.xml
+
+Le mode --archives répond à une limite de Pocket Casts, qui n'affiche que
+les 1 000 épisodes les plus récents d'un balado : il construit un second
+flux avec tous les épisodes du flux principal sauf les 1 000 plus récents,
+de sorte qu'aucun épisode ne devienne jamais inaccessible. Un épisode entré
+dans les archives n'en sort jamais.
 """
 
 import argparse
+import copy
 import email.utils
 import html as html_lib
 import http.client
@@ -523,6 +531,111 @@ def construire_rss(emission, episodes, url_autoreference=None):
     return ET.tostring(rss, encoding="utf-8", xml_declaration=True)
 
 
+# Préfixe des GUID du flux des archives : il distingue les épisodes des
+# archives de leurs jumeaux du flux principal (Pocket Casts les traite
+# alors comme des épisodes différents). Le préfixe garde la mention
+# « 2017-2020 » des débuts du flux ; c'est un identifiant interne,
+# invisible dans l'application — le changer casserait la progression
+# d'écoute des épisodes déjà présents dans les archives.
+PREFIXE_GUID_ARCHIVES = "archives-2017-2020-"
+
+
+def _date_item(item):
+    """Date de publication d'un <item> RSS (ou None si absente)."""
+    texte = item.findtext("pubDate")
+    if not texte:
+        return None
+    try:
+        return email.utils.parsedate_to_datetime(texte)
+    except (TypeError, ValueError):
+        return None
+
+
+def generer_archives(chemin_principal, chemin_sortie, titre=None, image=None,
+                     description=None, fenetre=1000):
+    """Génère le flux des archives d'une émission à partir de son flux principal.
+
+    Pocket Casts n'affiche que les `fenetre` épisodes les plus récents d'un
+    balado. Le flux des archives contient donc tous les épisodes du flux
+    principal sauf les `fenetre` plus récents, plus les épisodes déjà
+    présents dans l'ancien flux des archives : un épisode entré dans les
+    archives n'en sort jamais, même s'il se trouve encore dans la fenêtre
+    des plus récents (chevauchement des débuts du flux).
+
+    Renvoie (nombre d'épisodes dans les archives, nombre de nouveaux
+    épisodes ajoutés par rapport à l'ancien flux des archives).
+    """
+    ET.register_namespace("itunes", ITUNES_NS)
+    ET.register_namespace("atom", ATOM_NS)
+    racine = ET.parse(chemin_principal).getroot()
+    canal = racine.find("channel")
+    items = canal.findall("item")
+
+    # Épisodes hors de la fenêtre des plus récents, avec GUID préfixés.
+    archives = {}
+    for item in items[fenetre:]:
+        copie = copy.deepcopy(item)
+        guid = copie.find("guid")
+        if guid is None or not guid.text:
+            continue
+        if not guid.text.startswith(PREFIXE_GUID_ARCHIVES):
+            guid.text = PREFIXE_GUID_ARCHIVES + guid.text
+        archives[guid.text] = copie
+
+    # Union avec le flux des archives existant (s'il existe déjà).
+    anciens_guids = set()
+    chemin_sortie = Path(chemin_sortie)
+    if chemin_sortie.exists():
+        ancien = ET.parse(chemin_sortie).getroot().find("channel")
+        for item in ancien.findall("item"):
+            guid = item.findtext("guid")
+            if guid:
+                anciens_guids.add(guid)
+                if guid not in archives:
+                    archives[guid] = item
+    nouveaux = sum(1 for g in archives if g not in anciens_guids)
+
+    episodes = sorted(
+        archives.values(),
+        key=lambda it: _date_item(it) or datetime.min.replace(tzinfo=timezone.utc),
+        reverse=True,
+    )
+
+    # En-tête : celui du flux principal, avec titre, description et visuel
+    # propres aux archives.
+    titre_archives = titre or (canal.findtext("title") or "") + " — Archives"
+    rss = ET.Element("rss", {"version": "2.0"})
+    nouveau_canal = ET.SubElement(rss, "channel")
+    for enfant in canal:
+        if enfant.tag == "item":
+            continue
+        nouveau_canal.append(copy.deepcopy(enfant))
+    titre_el = nouveau_canal.find("title")
+    if titre_el is not None:
+        titre_el.text = titre_archives
+    if description is not None:
+        description_el = nouveau_canal.find("description")
+        if description_el is not None:
+            description_el.text = description
+    if image:
+        image_el = nouveau_canal.find("image")
+        if image_el is not None:
+            url_el = image_el.find("url")
+            if url_el is not None:
+                url_el.text = image
+            titre_image_el = image_el.find("title")
+            if titre_image_el is not None:
+                titre_image_el.text = titre_archives
+        itunes_image = nouveau_canal.find(f"{{{ITUNES_NS}}}image")
+        if itunes_image is not None:
+            itunes_image.set("href", image)
+    for ep in episodes:
+        nouveau_canal.append(ep)
+    xml = ET.tostring(rss, encoding="utf-8", xml_declaration=True)
+    chemin_sortie.write_bytes(xml)
+    return len(episodes), nouveaux
+
+
 # ---------------------------------------------------------------------------
 # Traitement d'une émission
 # ---------------------------------------------------------------------------
@@ -771,7 +884,54 @@ def main(argv=None):
         metavar="URL",
         help="Adresse publique où les flux seront hébergés (utilisée pour le lien atom:self).",
     )
+    parser.add_argument(
+        "--archives",
+        metavar="FLUX_PRINCIPAL",
+        help="Mode archives : construit le flux des archives à partir du flux principal indiqué (tous les épisodes sauf les plus récents, voir --fenetre). Exige --sortie-archives.",
+    )
+    parser.add_argument(
+        "--sortie-archives",
+        type=Path,
+        metavar="FICHIER",
+        help="Fichier .xml des archives à écrire (mode --archives). S'il existe déjà, ses épisodes sont conservés.",
+    )
+    parser.add_argument(
+        "--titre-archives",
+        metavar="TEXTE",
+        help="Titre du flux des archives (défaut : titre du flux principal + « — Archives »).",
+    )
+    parser.add_argument(
+        "--image-archives",
+        metavar="URL",
+        help="Visuel du flux des archives (défaut : celui du flux principal).",
+    )
+    parser.add_argument(
+        "--description-archives",
+        metavar="TEXTE",
+        help="Description du flux des archives (défaut : celle du flux principal).",
+    )
+    parser.add_argument(
+        "--fenetre",
+        type=int,
+        default=1000,
+        help="Nombre d'épisodes récents gardés hors des archives (défaut : 1000, la limite d'affichage de Pocket Casts).",
+    )
     options = parser.parse_args(argv)
+
+    if options.archives:
+        if not options.sortie_archives:
+            parser.error("--archives exige --sortie-archives.")
+        nb, nouveaux = generer_archives(
+            options.archives,
+            options.sortie_archives,
+            titre=options.titre_archives,
+            image=options.image_archives,
+            description=options.description_archives,
+            fenetre=options.fenetre,
+        )
+        print(f"Archives : {nb} épisodes ({nouveaux} nouveau(x)) "
+              f"-> {options.sortie_archives}")
+        return 0
 
     urls = list(options.emissions)
     if options.liste:
