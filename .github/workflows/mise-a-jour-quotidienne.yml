@@ -1,8 +1,9 @@
 # Mise à jour quotidienne des flux RSS OHdio.
-# Chaque jour vers 15 h (heure de Toronto), régénère les 6 flux et publie
-# les fichiers modifiés. Le flux d'archives 2017-2020 est figé : il n'est
-# jamais touché ici. Les pages GitHub se redéploient automatiquement à
-# chaque publication.
+# Chaque jour vers 15 h (heure de Toronto), régénère les 6 flux et le flux
+# des archives d'Aujourd'hui l'histoire, puis publie les fichiers modifiés.
+# Le flux des archives contient tous les épisodes sauf les 1 000 plus
+# récents (limite d'affichage de Pocket Casts). Les pages GitHub se
+# redéploient automatiquement à chaque publication.
 name: Mise à jour quotidienne des flux
 
 on:
@@ -27,6 +28,13 @@ jobs:
           python-version: '3.12'
       - name: Régénérer les flux
         run: python3 rcrss.py --liste emissions.txt --sortie . --max-episodes 2000 --max-pages 40
+      - name: Régénérer le flux des archives
+        run: |
+          python3 rcrss.py --archives aujourd-hui-l-histoire-3855.xml \
+            --sortie-archives aujourd-hui-l-histoire-archives-2017-2020.xml \
+            --titre-archives "Aujourd'hui l'histoire — Archives" \
+            --image-archives "https://fabricegagnon-a11y.github.io/ohdio-flux/aujourd-hui-l-histoire-archives-2017-2020.jpg" \
+            --description-archives "Les plus anciens épisodes d'Aujourd'hui l'histoire, au-delà des 1 000 plus récents affichés par Pocket Casts dans le flux principal."
       - name: Publier les changements
         run: |
           git config user.name "github-actions[bot]"
