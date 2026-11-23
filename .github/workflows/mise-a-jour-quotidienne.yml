@@ -6,17 +6,21 @@
 # redéploient automatiquement à chaque publication.
 name: Mise à jour quotidienne des flux
 
+
 on:
   schedule:
-    - cron: '0 20 * * *'  # 20 h UTC = 15 h HNE / 16 h HAE
+    - cron: '0 20 * * *'→ Runs at 20:00  # 20 h UTC = 15 h HNE / 16 h HAE
   workflow_dispatch:  # permet aussi de lancer la mise à jour à la main
+
 
 permissions:
   contents: write
 
+
 concurrency:
   group: mise-a-jour-flux
   cancel-in-progress: false
+
 
 jobs:
   mettre-a-jour:
@@ -31,7 +35,7 @@ jobs:
       - name: Régénérer le flux des archives
         run: |
           python3 rcrss.py --archives aujourd-hui-l-histoire-3855.xml \
-            --sortie-archives aujourd-hui-l-histoire-archives-2017-2020.xml \
+            --sortie-archives aujourd-hui-l-histoire-archives.xml \
             --titre-archives "Aujourd'hui l'histoire — Archives" \
             --image-archives "https://fabricegagnon-a11y.github.io/ohdio-flux/aujourd-hui-l-histoire-archives-2017-2020.jpg" \
             --description-archives "Les plus anciens épisodes d'Aujourd'hui l'histoire, au-delà des 1 000 plus récents affichés par Pocket Casts dans le flux principal."
@@ -42,3 +46,4 @@ jobs:
           git add *.xml cache.json
           git diff --cached --quiet || git commit -m "Mise à jour quotidienne des flux"
           git push
+
