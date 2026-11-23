@@ -7,7 +7,7 @@ Flux RSS des émissions de Radio-Canada Première, générés pour être écout�
 | Émission | Fichier |
 |---|---|
 | Aujourd'hui l'histoire | `aujourd-hui-l-histoire-3855.xml` |
-| Aujourd'hui l'histoire — Archives | `aujourd-hui-l-histoire-archives-2017-2020.xml` |
+| Aujourd'hui l'histoire — Archives | `aujourd-hui-l-histoire-archives.xml` |
 | La journée est encore jeune | `la-journee-est-encore-jeune-9887.xml` |
 | Pouvez-vous répéter la question ? | `humour-quiz-jeu-pierre-brassard-7791.xml` |
 | Les pires moments de l'histoire | `pires-moments-histoire-charles-beauchesne-humoriste-7135.xml` |
