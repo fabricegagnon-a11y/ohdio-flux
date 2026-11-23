@@ -39666,5 +39666,19 @@
   "tailles": {
    "10797510": 40575095
   }
+ },
+ "1242729": {
+  "titre": "Lundi 23 novembre 2026",
+  "lien": "https://ici.radio-canada.ca/ohdio/premiere/emissions/aujourd-hui-l-histoire/episodes/1242729/lundi-23-novembre-2026",
+  "resume": "",
+  "duree": 1380,
+  "diffuse_le": "2026-11-23T20:06:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10816621": "https://rcavmedias-download.akamaized.net/mp4/bed3cd9f-c6c9-45fe-a75a-1123f1c89278/2026-11-23_15_06_00_aujourdhuilhistoire_0000_128.mp4"
+  },
+  "tailles": {
+   "10816621": 30170426
+  }
  }
 }
