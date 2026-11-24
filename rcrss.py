@@ -16,6 +16,12 @@ d'OHdio, en utilisant les mêmes services publics que le site web lui-même :
   3. le programme assemble un fichier .xml par émission, prêt à héberger
      (par exemple sur Google Drive) et à ajouter dans Pocket Casts.
 
+Avec --url-base, chaque flux déclare en plus son adresse canonique
+(lien atom:self) et le concentrateur WebSub de Google (lien atom:hub) :
+un agrégateur abonné, comme Pocket Casts, est alors prévenu dès qu'un
+flux est régénéré — à condition de prévenir le concentrateur après
+chaque mise à jour (le workflow GitHub Actions du dépôt s'en charge).
+
 Usage personnel seulement. Ne nécessite aucune clé, aucun compte et aucune
 dépendance : Python 3.10+ suffit (bibliothèque standard uniquement).
 
@@ -62,6 +68,11 @@ USER_AGENT = (
 # Débit du flux audio (128 kb/s) : sert à estimer la taille du fichier
 # quand le serveur ne la fournit pas (128 000 bits/s = 16 000 octets/s).
 OCTETS_PAR_SECONDE = 16_000
+# Concentrateur WebSub déclaré dans chaque flux : les agrégateurs qui le
+# supportent (Pocket Casts depuis avril 2024) s'y abonnent et sont
+# prévenus dès qu'un flux est mis à jour, au lieu d'attendre leur
+# prochaine vérification périodique.
+HUB_WEBSUB = "https://pubsubhubbub.appspot.com/"
 
 EPISODE_URL_RE = re.compile(r"/episodes/(\d+)/")
 BALADO_EPISODE_URL_RE = re.compile(r"/balados/\d+/[^/]+/(\d+)/")
@@ -504,6 +515,13 @@ def construire_rss(emission, episodes, url_autoreference=None):
                 "type": "application/rss+xml",
             },
         )
+        # Déclaration WebSub : le concentrateur prévient les agrégateurs
+        # abonnés (Pocket Casts) dès que ce flux est régénéré.
+        ET.SubElement(
+            canal,
+            f"{{{ATOM_NS}}}link",
+            {"href": HUB_WEBSUB, "rel": "hub"},
+        )
     dates = [e["diffuse_le"] for e in episodes if e.get("diffuse_le")]
     if dates:
         ET.SubElement(canal, "lastBuildDate").text = formater_date_rfc2822(max(dates))
@@ -552,7 +570,7 @@ def _date_item(item):
 
 
 def generer_archives(chemin_principal, chemin_sortie, titre=None, image=None,
-                     description=None, fenetre=1000):
+                     description=None, fenetre=1000, url_autoreference=None):
     """Génère le flux des archives d'une émission à partir de son flux principal.
 
     Pocket Casts n'affiche que les `fenetre` épisodes les plus récents d'un
@@ -629,6 +647,29 @@ def generer_archives(chemin_principal, chemin_sortie, titre=None, image=None,
         itunes_image = nouveau_canal.find(f"{{{ITUNES_NS}}}image")
         if itunes_image is not None:
             itunes_image.set("href", image)
+    # Autoréférence : le flux des archives pointe vers sa propre URL, et
+    # non vers celle du flux principal (copiée avec l'en-tête) ; la
+    # déclaration WebSub est conservée ou ajoutée.
+    if url_autoreference:
+        lien_self = nouveau_canal.find(f"{{{ATOM_NS}}}link[@rel='self']")
+        if lien_self is not None:
+            lien_self.set("href", url_autoreference)
+        else:
+            ET.SubElement(
+                nouveau_canal,
+                f"{{{ATOM_NS}}}link",
+                {
+                    "href": url_autoreference,
+                    "rel": "self",
+                    "type": "application/rss+xml",
+                },
+            )
+        if nouveau_canal.find(f"{{{ATOM_NS}}}link[@rel='hub']") is None:
+            ET.SubElement(
+                nouveau_canal,
+                f"{{{ATOM_NS}}}link",
+                {"href": HUB_WEBSUB, "rel": "hub"},
+            )
     for ep in episodes:
         nouveau_canal.append(ep)
     xml = ET.tostring(rss, encoding="utf-8", xml_declaration=True)
@@ -882,7 +923,7 @@ def main(argv=None):
     parser.add_argument(
         "--url-base",
         metavar="URL",
-        help="Adresse publique où les flux seront hébergés (utilisée pour le lien atom:self).",
+        help="Adresse publique où les flux seront hébergés (utilisée pour le lien atom:self et la déclaration WebSub).",
     )
     parser.add_argument(
         "--archives",
@@ -921,6 +962,11 @@ def main(argv=None):
     if options.archives:
         if not options.sortie_archives:
             parser.error("--archives exige --sortie-archives.")
+        url_ref_archives = None
+        if options.url_base:
+            url_ref_archives = (
+                options.url_base.rstrip("/") + "/" + options.sortie_archives.name
+            )
         nb, nouveaux = generer_archives(
             options.archives,
             options.sortie_archives,
@@ -928,6 +974,7 @@ def main(argv=None):
             image=options.image_archives,
             description=options.description_archives,
             fenetre=options.fenetre,
+            url_autoreference=url_ref_archives,
         )
         print(f"Archives : {nb} épisodes ({nouveaux} nouveau(x)) "
               f"-> {options.sortie_archives}")

@@ -19,4 +19,6 @@ Adresse des flux : `https://fabricegagnon-a11y.github.io/ohdio-flux/<fichier>.xm
 
 ## Mise à jour automatique
 
-Les flux sont mis à jour chaque jour, automatiquement, par une tâche GitHub Actions (`.github/workflows/mise-a-jour-quotidienne.yml`) qui lance `rcrss.py` vers 15 h, heure de Toronto. Le programme (`rcrss.py`, `emissions.txt`) et son cache (`cache.json`) sont dans ce dépôt. Le flux des archives est régénéré chaque jour lui aussi : Pocket Casts n'affichant que les 1 000 épisodes les plus récents d'un balado, il contient tous les épisodes d'Aujourd'hui l'histoire sauf ces 1 000-là, de sorte qu'aucun épisode ne devienne jamais inaccessible.
+Les flux sont mis à jour chaque jour, automatiquement, par une tâche GitHub Actions (`.github/workflows/mise-a-jour-quotidienne.yml`) qui lance `rcrss.py` vers 14 h 45, heure de Toronto. Le programme (`rcrss.py`, `emissions.txt`) et son cache (`cache.json`) sont dans ce dépôt. Le flux des archives est régénéré chaque jour lui aussi : Pocket Casts n'affichant que les 1 000 épisodes les plus récents d'un balado, il contient tous les épisodes d'Aujourd'hui l'histoire sauf ces 1 000-là, de sorte qu'aucun épisode ne devienne jamais inaccessible.
+
+Chaque flux déclare le concentrateur WebSub de Google (lien `atom:hub`) : après chaque mise à jour, la tâche prévient le concentrateur, qui avertit aussitôt les agrégateurs abonnés (Pocket Casts) — les nouveaux épisodes apparaissent sans attendre la prochaine vérification périodique.
