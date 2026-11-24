@@ -1,5 +1,5 @@
 # Mise à jour quotidienne des flux RSS OHdio.
-# Chaque jour vers 14 h 45 (heure de Toronto), régénère les 6 flux et le flux
+# Chaque jour vers 14 h 45 (heure de Toronto), régénère les 7 flux et le flux
 # des archives d'Aujourd'hui l'histoire, puis publie les fichiers modifiés.
 # Le flux des archives contient tous les épisodes sauf les 1 000 plus
 # récents (limite d'affichage de Pocket Casts). Les pages GitHub se
@@ -8,7 +8,7 @@ name: Mise à jour quotidienne des flux
 
 on:
   schedule:
-    - cron: '45 19 * * *'  # 19 h 45 UTC = 14 h 45 HNE / 15 h 45 HAE
+    - cron: '45 19 * * *' # 19 h 45 UTC = 14 h 45 HNE / 15 h 45 HAE
   workflow_dispatch:  # permet aussi de lancer la mise à jour à la main
 
 permissions:
@@ -27,11 +27,12 @@ jobs:
         with:
           python-version: '3.12'
       - name: Régénérer les flux
-        run: python3 rcrss.py --liste emissions.txt --sortie . --max-episodes 2000 --max-pages 40
+        run: python3 rcrss.py --liste emissions.txt --sortie . --max-episodes 2000 --max-pages 40 --url-base https://fabricegagnon-a11y.github.io/ohdio-flux/
       - name: Régénérer le flux des archives
         run: |
           python3 rcrss.py --archives aujourd-hui-l-histoire-3855.xml \
             --sortie-archives aujourd-hui-l-histoire-archives.xml \
+            --url-base https://fabricegagnon-a11y.github.io/ohdio-flux/ \
             --titre-archives "Aujourd'hui l'histoire — Archives" \
             --image-archives "https://fabricegagnon-a11y.github.io/ohdio-flux/aujourd-hui-l-histoire-archives-2017-2020.jpg" \
             --description-archives "Les plus anciens épisodes d'Aujourd'hui l'histoire, au-delà des 1 000 plus récents affichés par Pocket Casts dans le flux principal."
@@ -42,3 +43,16 @@ jobs:
           git add *.xml cache.json
           git diff --cached --quiet || git commit -m "Mise à jour quotidienne des flux"
           git push
+      - name: Prévenir le concentrateur WebSub
+        run: |
+          # Laisser le temps aux pages GitHub de redéployer les flux
+          # avant de prévenir le concentrateur, sinon il lirait
+          # l'ancienne version.
+          sleep 60
+          for flux in *.xml; do
+            code=$(curl -s -o /dev/null -w "%{http_code}" -X POST \
+              --data-urlencode "hub.mode=publish" \
+              --data-urlencode "hub.url=https://fabricegagnon-a11y.github.io/ohdio-flux/$flux" \
+              https://pubsubhubbub.appspot.com/publish)
+            echo "$flux : HTTP $code"
+          done
