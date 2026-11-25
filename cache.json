@@ -39736,5 +39736,19 @@
   "tailles": {
    "10816325": 37791242
   }
+ },
+ "1291923": {
+  "titre": "Mercredi 25 nov. 2026 : Louis Blouin et Guy Cormier",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/9887/la-journee-est-encore-jeune/1291923/mercredi-25-nov-2026-louis-blouin-et-guy-cormier",
+  "resume": "Olivier recueille des réactions à l'interdiction de jouer à la tague à une école. Louis Blouin explique que Trump s’est possiblement placé en conflit d’intérêts en poussant Nvidia à réembaucher Jensen Huang. Et Guy Cormier parle de son saut en politique avec le PLC.",
+  "duree": 2003,
+  "diffuse_le": "2026-11-25T19:30:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10818631": "https://rcavmedias-download.akamaized.net/mp4/6f70747c-c9a4-4316-ab58-d7de6cb8d7ef/2026-11-25_14_30_00_lajourneeestencorejeuneohdio_0000_128.mp4"
+  },
+  "tailles": {
+   "10818631": 40062356
+  }
  }
 }
