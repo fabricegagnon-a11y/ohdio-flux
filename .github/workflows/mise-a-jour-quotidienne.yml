@@ -1,14 +1,23 @@
-# Mise à jour quotidienne des flux RSS OHdio.
-# Chaque jour vers 14 h 45 (heure de Toronto), régénère les 7 flux et le flux
-# des archives d'Aujourd'hui l'histoire, puis publie les fichiers modifiés.
+# Mise à jour des flux RSS OHdio, plusieurs fois par jour.
+# Les passages sont calés sur les heures de publication de chaque émission
+# (heure de Toronto) : 7 h 15 tous les jours, 11 h 30 le dimanche, 14 h 00 le
+# samedi, 14 h 45 et 15 h 30 du lundi au vendredi, 18 h 45 du lundi au jeudi,
+# 21 h 45 le vendredi. Chaque passage régénère les 7 flux et le flux des
+# archives d'Aujourd'hui l'histoire, puis publie les fichiers modifiés.
 # Le flux des archives contient tous les épisodes sauf les 1 000 plus
 # récents (limite d'affichage de Pocket Casts). Les pages GitHub se
 # redéploient automatiquement à chaque publication.
-name: Mise à jour quotidienne des flux
+name: Mise à jour des flux
 
 on:
   schedule:
-    - cron: '45 19 * * *'  # 19 h 45 UTC = 14 h 45 HNE / 15 h 45 HAE
+    - cron: '15 12 * * *'   # 12 h 15 UTC = 7 h 15 HNE / 8 h 15 HAE, tous les jours
+    - cron: '30 16 * * 0'   # 16 h 30 UTC = 11 h 30 HNE / 12 h 30 HAE, dimanche
+    - cron: '0 19 * * 6'    # 19 h 00 UTC = 14 h 00 HNE / 15 h 00 HAE, samedi
+    - cron: '45 19 * * 1-5' # 19 h 45 UTC = 14 h 45 HNE / 15 h 45 HAE, lun.-ven.
+    - cron: '30 20 * * 1-5' # 20 h 30 UTC = 15 h 30 HNE / 16 h 30 HAE, lun.-ven.
+    - cron: '45 23 * * 1-4' # 23 h 45 UTC = 18 h 45 HNE / 19 h 45 HAE, lun.-jeu.
+    - cron: '45 2 * * 6'    # 2 h 45 UTC samedi = 21 h 45 HNE / 22 h 45 HAE, vendredi
   workflow_dispatch:  # permet aussi de lancer la mise à jour à la main
 
 permissions:
@@ -41,7 +50,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add *.xml cache.json
-          git diff --cached --quiet || git commit -m "Mise à jour quotidienne des flux"
+          git diff --cached --quiet || git commit -m "Mise à jour des flux"
           git push
       - name: Prévenir le concentrateur WebSub
         run: |
