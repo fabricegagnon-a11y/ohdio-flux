@@ -467,6 +467,28 @@ ITUNES_NS = "http://www.itunes.com/dtds/podcast-1.0.dtd"
 ATOM_NS = "http://www.w3.org/2005/Atom"
 
 
+def _parser_date(valeur):
+    """Chaîne ISO -> datetime, ou None si absente/illisible."""
+    if not valeur:
+        return None
+    try:
+        return datetime.fromisoformat(str(valeur).replace("Z", "+00:00"))
+    except ValueError:
+        return None
+
+
+MOIS_FR = [
+    "janvier", "février", "mars", "avril", "mai", "juin",
+    "juillet", "août", "septembre", "octobre", "novembre", "décembre",
+]
+
+
+def _date_fr(dt):
+    """Datetime -> « 29 avril 2026 » (pour les descriptions)."""
+    jour = "1er" if dt.day == 1 else str(dt.day)
+    return f"{jour} {MOIS_FR[dt.month - 1]} {dt.year}"
+
+
 def formater_date_rfc2822(dt):
     """Datetime -> date RFC 2822 (GMT), comme l'exige RSS."""
     if dt is None:
@@ -742,13 +764,31 @@ def traiter_emission(url_emission, options, cache, chemin_cache=None):
     infos_emission["url"] = url_base
 
     episodes_flux = []
-    stats = {"sans_audio": 0, "rediffusions_exclues": 0, "erreurs": 0}
+    stats = {"sans_audio": 0, "rediffusions_exclues": 0,
+             "rediffusions_ajoutees": 0, "erreurs": 0}
     for index_ep, ep in enumerate(episodes_trouves[: options.max_episodes], start=1):
         eid = ep["id"]
         entree_cache = cache.get(eid)
         try:
             if entree_cache and not options.rafraichir:
                 donnees = entree_cache
+                # Rediffusion d'un épisode déjà connu : la page donne une
+                # date de diffusion plus récente que celle en cache. On
+                # la consigne dans l'entrée du cache pour émettre un item
+                # « Rediffusion » distinct, sans toucher à l'item
+                # d'origine (même GUID, même date, progression intacte).
+                if ep.get("rediffusion") and ep.get("diffuse_le"):
+                    date_fraiche = _parser_date(ep["diffuse_le"])
+                    date_cache = _parser_date(donnees.get("diffuse_le"))
+                    if date_fraiche and (
+                        date_cache is None or date_fraiche > date_cache
+                    ):
+                        rediffs = donnees.setdefault("rediffusions", [])
+                        cle = date_fraiche.isoformat()
+                        if cle not in rediffs:
+                            rediffs.append(cle)
+                            print(f"  [..] rediffusion consignée : "
+                                  f"{donnees.get('titre') or eid} ({cle})")
             else:
                 donnees = {
                     "titre": ep.get("titre", ""),
@@ -789,6 +829,10 @@ def traiter_emission(url_emission, options, cache, chemin_cache=None):
                         if taille is None and donnees.get("duree"):
                             taille = donnees["duree"] * OCTETS_PAR_SECONDE
                         donnees["tailles"][media_id] = taille or 0
+                if donnees.get("rediffusion"):
+                    # Épisode découvert à l'occasion d'une rediffusion :
+                    # son item portera la mention « Rediffusion ».
+                    donnees["titre_rediffusion"] = True
                 cache[eid] = donnees
             # Compléments (durée/date) si la page ne les donnait pas. Vaut
             # aussi pour les entrées du cache dont la date est une « époque »
@@ -819,6 +863,8 @@ def traiter_emission(url_emission, options, cache, chemin_cache=None):
             medias = list(media_urls.items())
             for index, (media_id, audio_url) in enumerate(medias):
                 titre = donnees.get("titre") or f"Épisode {eid}"
+                if donnees.get("titre_rediffusion"):
+                    titre = f"Rediffusion : {titre}"
                 if len(medias) > 1:
                     titre = f"{titre} (partie {index + 1})"
                 episodes_flux.append(
@@ -833,6 +879,39 @@ def traiter_emission(url_emission, options, cache, chemin_cache=None):
                         "taille": (donnees.get("tailles") or {}).get(media_id, 0),
                     }
                 )
+            # Items distincts pour les rediffusions consignées : même
+            # audio, GUID propre à la date de rediffusion (Pocket Casts
+            # les présente alors comme des nouveautés), titre marqué.
+            if not options.exclure_rediffusions:
+                for date_rediff in donnees.get("rediffusions") or []:
+                    dt_rediff = _parser_date(date_rediff)
+                    if dt_rediff is None:
+                        continue
+                    for index, (media_id, audio_url) in enumerate(medias):
+                        titre_r = donnees.get("titre") or f"Épisode {eid}"
+                        titre_r = f"Rediffusion : {titre_r}"
+                        if len(medias) > 1:
+                            titre_r = f"{titre_r} (partie {index + 1})"
+                        description_r = donnees.get("resume", "")
+                        if diffuse_le is not None:
+                            description_r = (
+                                f"Rediffusion de l'épisode diffusé le "
+                                f"{_date_fr(diffuse_le)}. " + description_r
+                            ).strip()
+                        episodes_flux.append(
+                            {
+                                "guid": (f"{eid}_rediff"
+                                         f"{dt_rediff.strftime('%Y%m%d')}_{index}"),
+                                "titre": titre_r,
+                                "lien": donnees.get("lien") or ep["url"],
+                                "description": description_r,
+                                "diffuse_le": dt_rediff,
+                                "duree": donnees.get("duree"),
+                                "audio_url": audio_url,
+                                "taille": (donnees.get("tailles") or {}).get(media_id, 0),
+                            }
+                        )
+                        stats["rediffusions_ajoutees"] += 1
         except FetchError as e:
             stats["erreurs"] += 1
             print(f"  [!!] épisode {eid} ignoré ({e})")
@@ -1002,6 +1081,7 @@ def main(argv=None):
             print(f"  -> {nom} : {nb} épisodes avec audio "
                   f"({stats['sans_audio']} sans audio, "
                   f"{stats['rediffusions_exclues']} rediffusions exclues, "
+                  f"{stats['rediffusions_ajoutees']} items de rediffusion, "
                   f"{stats['erreurs']} erreurs)")
             total_fichiers += 1
         except FetchError as e:
