@@ -39781,5 +39781,19 @@
   "tailles": {
    "10819614": 40943298
   }
+ },
+ "1242813": {
+  "titre": "La route 66, 100 ans de mythe et de liberté",
+  "lien": "https://ici.radio-canada.ca/ohdio/premiere/emissions/aujourd-hui-l-histoire/episodes/1242813/jeudi-26-novembre-2026",
+  "resume": "Longue de 4000 km, la route 66 traverse 8 États américains et 3 fuseaux horaire. La « route mère », ce long ruban d’asphalte entre Chicago et Los Angeles, incarne l’aventure, la liberté, la nostalgie et l’espoir d’une vie meilleure. L’historien Harold Bérubé nous dit pourquoi elle est restée mythique.",
+  "duree": 1380,
+  "diffuse_le": "2026-11-26T20:06:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10819728": "https://rcavmedias-download.akamaized.net/mp4/ad1b573a-270a-4eea-8151-65aef314b847/2026-11-26_15_06_00_aujourdhuilhistoire_0000_128.mp4"
+  },
+  "tailles": {
+   "10819728": 30176570
+  }
  }
 }
