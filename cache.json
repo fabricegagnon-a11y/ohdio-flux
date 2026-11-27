@@ -7588,7 +7588,10 @@
   },
   "tailles": {
    "8565288": 30172327
-  }
+  },
+  "rediffusions": [
+   "2026-11-27T20:06:00+00:00"
+  ]
  },
  "952419": {
   "titre": "La guerre franco-allemande de 1870 et ses séquelles sur l’Europe",
@@ -39808,6 +39811,20 @@
   },
   "tailles": {
    "10816335": 38343837
+  }
+ },
+ "1292467": {
+  "titre": "Vendredi 27 nov. 2026 : Marc Cassivi et Catherine Morency",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/9887/la-journee-est-encore-jeune/1292467/vendredi-27-nov-2026-marc-cassivi-et-catherine-morency",
+  "resume": "Olivier résume la saga Kraft Dinner. Marc Cassivi critique Paper Tiger , l'un des meilleurs films de l'année. Et Catherine Morency propose des solutions pour financer les infrastructures à Montréal au lieu de hausser les taxes.",
+  "duree": 2115,
+  "diffuse_le": "2026-11-27T19:30:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10820618": "https://rcavmedias-download.akamaized.net/mp4/287059a4-a758-43e2-9543-7a97b555c56d/2026-11-27_14_30_00_lajourneeestencorejeuneohdio_0000_128.mp4"
+  },
+  "tailles": {
+   "10820618": 41839356
   }
  }
 }
