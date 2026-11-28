@@ -39826,5 +39826,19 @@
   "tailles": {
    "10820618": 41839356
   }
+ },
+ "1292378": {
+  "titre": "Le meilleur de la semaine du 23 novembre 2026",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/14021/lhistoire-est-encore-jeune/1292378/le-meilleur-de-la-semaine-du-23-novembre-2026",
+  "resume": "Voici un assemblage des quatre émissions diffusées cette semaine. Au menu : la fondation de Charlie Hebdo , l’invention de la poubelle, la création du parc national de Banff et la sortie du film Casablanca .",
+  "duree": 4949,
+  "diffuse_le": "2026-11-28T02:30:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10820345": "https://rcavmedias-download.akamaized.net/mp4/cb60dfb2-0f28-4d36-b250-e6d5ec8a27b0/2026-11-27_10_27_00_lhistoireestencorejeune_0000_128.mp4"
+  },
+  "tailles": {
+   "10820345": 86814329
+  }
  }
 }
