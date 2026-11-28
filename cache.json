@@ -39854,5 +39854,19 @@
   "tailles": {
    "10820658": 45642871
   }
+ },
+ "1292622": {
+  "titre": "Une spéciale en plein Salon du livre de Montréal!",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/7791/humour-quiz-jeu-pierre-brassard/1292622/speciale-salon-du-livre-montreal-simon-pare-poupart-charlotte-aubin-jean-philippe-baril-guerard",
+  "resume": "Cette semaine, Pierre Brassard reçoit Simon Paré-Poupart, Charlotte Aubin et Jean-Philippe Baril Guérard, qui doivent répondre à des questions sur : les nouveaux habits de Louise Arbour, les sacrifices à faire selon Soraya Martinez Ferrada, le « grand entretien » de Paris, le câlin du premier ministre albanais, la mise en garde donnée par Paris Hilton, le Championnat du monde de l’œuf mayo et le secret du succès de Carlos Alcaraz.",
+  "duree": 3194,
+  "diffuse_le": "2026-11-28T18:00:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10821280": "https://rcavmedias-download.akamaized.net/mp4/d853908c-bcc4-472c-8e5c-d8f85875c3ba/2026-11-28_11_38_00_repeterlaquestionwweb_0000_128.mp4"
+  },
+  "tailles": {
+   "10821280": 58966110
+  }
  }
 }
