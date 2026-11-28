@@ -39840,5 +39840,19 @@
   "tailles": {
    "10820345": 86814329
   }
+ },
+ "1292483": {
+  "titre": "Samedi 28 nov. 2026 : Olivier Niquet en brochette",
+  "lien": "https://ici.radio-canada.ca/ohdio/balados/9887/la-journee-est-encore-jeune/1292483/samedi-28-nov-2026-olivier-niquet-en-brochette",
+  "resume": "L’avocat ontarien Lawrence David explique pourquoi il conteste la loi québécoise sur le serment au roi. Éric Duhaime se dit prêt à prêter serment au roi en se cachant dans un garde-robe, en se croisant les doigts et en se bouchant le nez. Et la mairesse de Montréal, Soraya Martinez Ferrada, s’excuse d’avoir suggéré de manger du Kraft Dinner plutôt que du filet mignon si l’on manque d’argent.",
+  "duree": 2355,
+  "diffuse_le": "2026-11-28T12:00:00.000Z",
+  "rediffusion": false,
+  "media_urls": {
+   "10820658": "https://rcavmedias-download.akamaized.net/mp4/cfec4b8f-3455-4ad7-9e7f-839bac2dcda0/2026-11-27_14_53_00_lajourneeestencorejeuneohdio_0000_128.mp4"
+  },
+  "tailles": {
+   "10820658": 45642871
+  }
  }
 }
